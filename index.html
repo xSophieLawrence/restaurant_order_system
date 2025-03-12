@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Ordering System</title>
+</head>
+<body>
+    <h2>Restaurant Ordering System</h2>
+    <form action="http://localhost:5000/submit_order" method="post">
+        <label for="table">Table Number:</label>
+        <input type="number" id="table" name="table" required><br><br>
+
+        <label for="allergen">Allergen (if any):</label>
+        <input type="text" id="allergen" name="allergen"><br><br>
+
+        <label for="dish">Dish:</label>
+        <input type="text" id="dish" name="dish" required><br><br>
+
+        <input type="submit" value="Place Order">
+    </form>
+</body>
+</html>
