@@ -5,11 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant Ordering System</title>
     <script>
+        let statusPolling = null; // Stores interval for checking status
+
         function checkAllergenStatus() {
             fetch("http://192.168.0.25:5000/status")
             .then(response => response.json())
             .then(data => {
+                console.log("Received status:", data.status); // Debugging output
+                document.getElementById("statusMessage").innerText = `Status: ${data.status}`;
+
                 if (data.status === "All allergen checks completed") {
+                    clearInterval(statusPolling); // Stop checking once completed
                     alert("✅ All allergen checks completed!");
                 }
             })
@@ -17,7 +23,7 @@
         }
 
         function submitOrder(event) {
-            event.preventDefault(); // Prevent form from navigating away
+            event.preventDefault(); // Prevent page refresh
 
             let formData = new FormData(document.getElementById("orderForm"));
             fetch("http://192.168.0.25:5000/submit_order", {
@@ -27,7 +33,10 @@
             .then(response => response.text())
             .then(data => {
                 document.getElementById("statusMessage").innerText = "✅ Order received. Waiting for allergen check...";
-                setInterval(checkAllergenStatus, 2000); // Start checking for allergen status
+                
+                // Start polling for allergen check status every 2 seconds
+                if (statusPolling) clearInterval(statusPolling); // Avoid multiple intervals
+                statusPolling = setInterval(checkAllergenStatus, 2000);
             })
             .catch(error => console.error("Error submitting order:", error));
         }
@@ -48,6 +57,7 @@
         <input type="submit" value="Place Order">
     </form>
 
-    <p id="statusMessage"></p>
+    <p id="statusMessage">Status: Waiting for order...</p>
 </body>
 </html>
+
