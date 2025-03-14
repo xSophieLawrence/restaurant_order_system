@@ -16,12 +16,26 @@
             .catch(error => console.error("Error fetching status:", error));
         }
 
-        setInterval(checkAllergenStatus, 2000);  // Check every 2 seconds
+        function submitOrder(event) {
+            event.preventDefault(); // Prevent form from navigating away
+
+            let formData = new FormData(document.getElementById("orderForm"));
+            fetch("http://192.168.0.25:5000/submit_order", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("statusMessage").innerText = "✅ Order received. Waiting for allergen check...";
+                setInterval(checkAllergenStatus, 2000); // Start checking for allergen status
+            })
+            .catch(error => console.error("Error submitting order:", error));
+        }
     </script>
 </head>
 <body>
     <h2>Restaurant Ordering System</h2>
-    <form action="http://192.168.0.25:5000/submit_order" method="post">
+    <form id="orderForm" onsubmit="submitOrder(event)">
         <label for="table">Table Number:</label>
         <input type="number" id="table" name="table" required><br><br>
 
@@ -33,5 +47,7 @@
 
         <input type="submit" value="Place Order">
     </form>
+
+    <p id="statusMessage"></p>
 </body>
 </html>
