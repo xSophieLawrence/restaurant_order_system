@@ -3,22 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Order Status</title>
+    <title>Restaurant Ordering System</title>
     <script>
-        function checkStatus() {
+        function checkAllergenStatus() {
             fetch("http://192.168.0.25:5000/status")
             .then(response => response.json())
             .then(data => {
-                document.getElementById("status").innerText = data.status;
+                if (data.status === "All allergen checks completed") {
+                    alert("✅ All allergen checks completed!");
+                }
             })
             .catch(error => console.error("Error fetching status:", error));
         }
 
-        setInterval(checkStatus, 2000);  // Check status every 2 seconds
+        setInterval(checkAllergenStatus, 2000);  // Check every 2 seconds
     </script>
 </head>
 <body>
-    <h2>Customer Order Status</h2>
-    <p><strong>Allergen Check Status:</strong> <span id="status">Pending</span></p>
+    <h2>Restaurant Ordering System</h2>
+    <form action="http://192.168.0.25:5000/submit_order" method="post">
+        <label for="table">Table Number:</label>
+        <input type="number" id="table" name="table" required><br><br>
+
+        <label for="allergen">Allergen (if any):</label>
+        <input type="text" id="allergen" name="allergen"><br><br>
+
+        <label for="dish">Dish:</label>
+        <input type="text" id="dish" name="dish" required><br><br>
+
+        <input type="submit" value="Place Order">
+    </form>
 </body>
 </html>
