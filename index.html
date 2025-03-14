@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Ordering System</title>
+    <title>Customer Order Status</title>
+    <script>
+        function checkStatus() {
+            fetch("http://192.168.0.25:5000/status")
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("status").innerText = data.status;
+            })
+            .catch(error => console.error("Error fetching status:", error));
+        }
+
+        setInterval(checkStatus, 2000);  // Check status every 2 seconds
+    </script>
 </head>
 <body>
-    <h2>Restaurant Ordering System</h2>
-    <form action="http://192.168.0.25:5000/submit_order" method="post">
-        <label for="table">Table Number:</label>
-        <input type="number" id="table" name="table" required><br><br>
-
-        <label for="allergen">Allergen (if any):</label>
-        <input type="text" id="allergen" name="allergen"><br><br>
-
-        <label for="dish">Dish:</label>
-        <input type="text" id="dish" name="dish" required><br><br>
-
-        <input type="submit" value="Place Order">
-    </form>
+    <h2>Customer Order Status</h2>
+    <p><strong>Allergen Check Status:</strong> <span id="status">Pending</span></p>
 </body>
 </html>
