@@ -3,33 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Restaurant Ordering System</title>
+  <title>Order Received</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #status {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: green;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-  <h2>Restaurant Ordering System</h2>
-  <form action="http://192.168.0.25:5000/submit_order" method="post">
-    <label for="table">Table Number:</label>
-    <input type="number" id="table" name="table" required><br><br>
-
-    <label for="allergen">Allergen (if any):</label>
-    <input type="text" id="allergen" name="allergen"><br><br>
-
-    <label for="dish">Dish:</label>
-    <input type="text" id="dish" name="dish" required><br><br>
-
-    <input type="submit" value="Place Order">
-  </form>
-  
-  <div id="notification" style="margin-top:20px; font-weight:bold; color:green;"></div>
+  <h2>Order Received</h2>
+  <p>Your order has been placed.</p>
+  <div id="status">Allergen checks pending...</div>
   
   <script>
-    // Poll the /status endpoint every 2 seconds to update allergen status
+    // Poll the /status endpoint every 2 seconds
     setInterval(() => {
-      fetch('http://192.168.0.25:5000/status')
+      // Append a timestamp to avoid caching issues
+      fetch('http://192.168.0.25:5000/status?t=' + new Date().getTime())
         .then(response => response.json())
         .then(data => {
-          document.getElementById("notification").innerText = data.status;
-          console.log("Status:", data.status);
+          // If the status returned from Flask is "Pending", display a friendly message
+          let statusText = data.status;
+          if (statusText === "Pending") {
+            statusText = "Allergen checks pending...";
+          }
+          document.getElementById("status").innerText = statusText;
+          console.log("Status updated:", statusText);
         })
         .catch(error => console.error('Error fetching status:', error));
     }, 2000);
