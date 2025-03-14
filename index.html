@@ -4,16 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant Ordering System</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        #allergen-status { font-size: 18px; color: red; font-weight: bold; }
-    </style>
 </head>
 <body>
     <h2>Restaurant Ordering System</h2>
-
-    <!-- Order Form -->
     <form action="http://192.168.0.25:5000/submit_order" method="post">
         <label for="table">Table Number:</label>
         <input type="number" id="table" name="table" required><br><br>
@@ -26,23 +19,5 @@
 
         <input type="submit" value="Place Order">
     </form>
-
-    <!-- Allergen Check Status -->
-    <p id="allergen-status">⚠️ Allergen Checks Pending</p>
-
-    <script>
-        // Connect to Python server for real-time updates
-        var socket = io("http://192.168.0.25:5000"); // Adjust based on your server IP
-
-        // Listen for allergen check updates
-        socket.on("notification", function(data) {
-            if (data.message === "ALLERGEN_CHECK_COMPLETE") {
-                document.getElementById("allergen-status").innerText = "✅ Allergen Checks Completed";
-                document.getElementById("allergen-status").style.color = "green";
-                alert("Allergen Checks Completed!");
-            }
-        });
-    </script>
 </body>
 </html>
-
