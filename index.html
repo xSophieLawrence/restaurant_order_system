@@ -18,7 +18,7 @@
 <body>
   <h2>Restaurant Ordering System</h2>
   
-  <!-- Order Form -->
+  <!-- Order Form Section -->
   <div id="formContainer">
     <form id="orderForm">
       <label for="table">Table Number:</label>
@@ -42,41 +42,50 @@
   </div>
   
   <script>
-    // Handle form submission via AJAX
+    // Handle order form submission via AJAX
     document.getElementById("orderForm").addEventListener("submit", function(e) {
-      e.preventDefault();  // Prevent the default form submission behavior
+      e.preventDefault();  // Prevent the default form submission
       
       const formData = new FormData(this);
+      console.log("Submitting order with data:");
+      for (const pair of formData.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+      }
       
+      // Send a POST request to your Flask server
       fetch("http://192.168.0.25:5000/submit_order", {
         method: "POST",
         body: formData
       })
       .then(response => {
+        console.log("Received response status:", response.status);
         if (!response.ok) {
           throw new Error("Network response was not ok: " + response.statusText);
         }
         return response.text();
       })
       .then(data => {
-        console.log("Order response:", data);
+        console.log("Order response from server:", data);
         // Hide the order form and show the order received section
         document.getElementById("formContainer").style.display = "none";
         document.getElementById("orderReceived").style.display = "block";
       })
       .catch(error => {
         console.error("Error placing order:", error);
+        alert("Error placing order: " + error);
       });
     });
     
-    // Function to poll the Flask server's /status endpoint to update allergen status
+    // Function to poll the Flask server's /status endpoint
     function pollStatus() {
-      // Add a timestamp query parameter to prevent caching
       fetch("http://192.168.0.25:5000/status?t=" + new Date().getTime())
-        .then(response => response.json())
+        .then(response => {
+          console.log("Status endpoint response:", response);
+          return response.json();
+        })
         .then(data => {
+          console.log("Polled allergen status:", data.status);
           let statusText = data.status;
-          // Optionally, display a friendly message if status is still "Pending"
           if (statusText === "Pending") {
             statusText = "Allergen checks pending...";
           }
@@ -85,7 +94,7 @@
         .catch(error => console.error("Error fetching status:", error));
     }
     
-    // Poll the status endpoint every 2 seconds
+    // Poll every 2 seconds
     setInterval(pollStatus, 2000);
   </script>
 </body>
