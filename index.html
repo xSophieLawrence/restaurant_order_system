@@ -1,41 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Ordering System</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Restaurant Ordering System</title>
 </head>
 <body>
-    <h2>Restaurant Ordering System</h2>
-    <form action="http://192.168.0.25:5000/submit_order" method="post">
-        <label for="table">Table Number:</label>
-        <input type="number" id="table" name="table" required><br><br>
+  <h2>Restaurant Ordering System</h2>
+  <form id="orderForm">
+    <label for="table">Table Number:</label>
+    <input type="number" id="table" name="table" required /><br><br>
 
-        <label for="allergen">Allergen (if any):</label>
-        <input type="text" id="allergen" name="allergen"><br><br>
+    <label for="allergen">Allergen (if any):</label>
+    <input type="text" id="allergen" name="allergen" /><br><br>
 
-        <label for="dish">Dish:</label>
-        <input type="text" id="dish" name="dish" required><br><br>
+    <label for="dish">Dish:</label>
+    <input type="text" id="dish" name="dish" required /><br><br>
 
-        <input type="submit" value="Place Order">
-    </form>
-    <div id="notification" style="margin-top:20px; font-weight:bold; color:green;"></div>
+    <input type="submit" value="Place Order" />
+  </form>
 
-    <script>
-    // Function to poll the status endpoint every 2 seconds
-    function checkStatus() {
-        fetch('http://192.168.0.25:5000/status')
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "All allergen checks completed") {
-                    document.getElementById("notification").innerText = data.status;
-                }
-            })
-            .catch(error => console.error('Error fetching status:', error));
-    }
+  <div id="response" style="margin-top:20px; font-weight:bold;"></div>
 
-    setInterval(checkStatus, 2000);  // Poll every 2 seconds
-    </script>
+  <script>
+    // Listen for form submission
+    document.getElementById("orderForm").addEventListener("submit", function (event) {
+      event.preventDefault(); // Prevent the default form submission
+
+      const formData = new FormData(this);
+
+      // Log form data for debugging
+      for (let pair of formData.entries()) {
+        console.log(pair[0]+ ': ' + pair[1]);
+      }
+
+      // Use fetch API to POST form data to Flask server
+      fetch("http://192.168.0.25:5000/submit_order", {
+        method: "POST",
+        body: formData
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok " + response.statusText);
+          }
+          return response.text();
+        })
+        .then(data => {
+          document.getElementById("response").innerText = data;
+          console.log("Server response:", data);
+        })
+        .catch(error => {
+          console.error("Error submitting order:", error);
+          document.getElementById("response").innerText = "Error submitting order: " + error;
+        });
+    });
+  </script>
 </body>
 </html>
+
 
