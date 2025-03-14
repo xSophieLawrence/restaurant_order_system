@@ -1,105 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Restaurant Ordering System</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    #orderForm { margin-bottom: 20px; }
-    #status {
-      font-size: 1.5em;
-      font-weight: bold;
-      color: green;
-      margin-top: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Ordering System</title>
 </head>
 <body>
-  <h2>Restaurant Ordering System</h2>
-  
-  <!-- Order Form Section -->
-  <div id="formContainer">
-    <form id="orderForm">
-      <label for="table">Table Number:</label>
-      <input type="number" id="table" name="table" required><br><br>
-      
-      <label for="allergen">Allergen (if any):</label>
-      <input type="text" id="allergen" name="allergen"><br><br>
-      
-      <label for="dish">Dish:</label>
-      <input type="text" id="dish" name="dish" required><br><br>
-      
-      <button type="submit">Place Order</button>
+    <h2>Restaurant Ordering System</h2>
+    <form action="http://192.168.0.25:5000/submit_order" method="post">
+        <label for="table">Table Number:</label>
+        <input type="number" id="table" name="table" required><br><br>
+
+        <label for="allergen">Allergen (if any):</label>
+        <input type="text" id="allergen" name="allergen"><br><br>
+
+        <label for="dish">Dish:</label>
+        <input type="text" id="dish" name="dish" required><br><br>
+
+        <input type="submit" value="Place Order">
     </form>
-  </div>
-  
-  <!-- Order Received Section -->
-  <div id="orderReceived" style="display: none;">
-    <h3>Order Received</h3>
-    <p>Your order has been placed.</p>
-    <div id="status">Allergen checks pending...</div>
-  </div>
-  
-  <script>
-    // Use the new localtunnel public URL for your Flask server
-    const BASE_URL = "https://thin-ducks-poke.loca.lt";
-    
-    // Handle order form submission via AJAX
-    document.getElementById("orderForm").addEventListener("submit", function(e) {
-      e.preventDefault();  // Prevent the default form submission
-      
-      const formData = new FormData(this);
-      console.log("Submitting order data:");
-      for (const pair of formData.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
-      }
-      
-      // Send a POST request to your Flask server via the secure URL
-      fetch(BASE_URL + "/submit_order", {
-        method: "POST",
-        body: formData
-      })
-      .then(response => {
-        console.log("Response status:", response.status);
-        if (!response.ok) {
-          throw new Error("Network response was not ok: " + response.statusText);
-        }
-        return response.text();
-      })
-      .then(data => {
-        console.log("Order response from server:", data);
-        // Hide the order form and show the order received section
-        document.getElementById("formContainer").style.display = "none";
-        document.getElementById("orderReceived").style.display = "block";
-      })
-      .catch(error => {
-        console.error("Error placing order:", error);
-        alert("Error placing order: " + error);
-      });
-    });
-    
-    // Function to poll the Flask server's /status endpoint
-    function pollStatus() {
-      // Append a timestamp to avoid caching
-      fetch(BASE_URL + "/status?t=" + new Date().getTime())
-        .then(response => {
-          console.log("Status endpoint response:", response);
-          return response.json();
-        })
-        .then(data => {
-          console.log("Polled allergen status:", data.status);
-          let statusText = data.status;
-          if (statusText === "Pending") {
-            statusText = "Allergen checks pending...";
-          }
-          document.getElementById("status").innerText = statusText;
-        })
-        .catch(error => console.error("Error fetching status:", error));
-    }
-    
-    // Poll every 2 seconds
-    setInterval(pollStatus, 2000);
-  </script>
 </body>
 </html>
