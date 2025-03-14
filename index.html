@@ -1,41 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Ordering System</title>
+  <meta charset="UTF-8">
+  <title>Restaurant Ordering System</title>
 </head>
 <body>
-    <h2>Restaurant Ordering System</h2>
-    <form action="http://192.168.0.25:5000/submit_order" method="post">
-        <label for="table">Table Number:</label>
-        <input type="number" id="table" name="table" required><br><br>
-
-        <label for="allergen">Allergen (if any):</label>
-        <input type="text" id="allergen" name="allergen"><br><br>
-
-        <label for="dish">Dish:</label>
-        <input type="text" id="dish" name="dish" required><br><br>
-
-        <input type="submit" value="Place Order">
-    </form>
-    
-    <div id="notification" style="margin-top:20px; font-weight:bold; color:green;"></div>
-    
-    <script>
-        // Poll the /status endpoint every 2 seconds
-        setInterval(() => {
-            fetch('http://192.168.0.25:5000/status')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === "All allergen checks completed") {
-                        document.getElementById("notification").innerText = data.status;
-                    }
-                })
-                .catch(error => console.error('Error fetching status:', error));
-        }, 2000);
-    </script>
+  <h2>Restaurant Ordering System</h2>
+  <form action="http://192.168.0.25:5000/submit_order" method="post">
+    <label for="table">Table Number:</label>
+    <input type="number" id="table" name="table" required><br><br>
+    <label for="allergen">Allergen (if any):</label>
+    <input type="text" id="allergen" name="allergen"><br><br>
+    <label for="dish">Dish:</label>
+    <input type="text" id="dish" name="dish" required><br><br>
+    <input type="submit" value="Place Order">
+  </form>
+  <div id="notification" style="margin-top:20px; font-weight:bold; color:green;"></div>
+  
+  <script>
+    // Poll the /status endpoint every 2 seconds for allergen status updates.
+    setInterval(() => {
+      fetch('http://192.168.0.25:5000/status')
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "All allergen checks completed") {
+            document.getElementById("notification").innerText = data.status;
+          }
+        })
+        .catch(error => console.error('Error fetching status:', error));
+    }, 2000);
+  </script>
 </body>
 </html>
-
 
